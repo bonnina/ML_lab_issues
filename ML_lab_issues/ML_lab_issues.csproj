@@ -14,4 +14,13 @@
     <PackageReference Include="Microsoft.ML" Version="1.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\issues_test.tsv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\issues_train.tsv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
