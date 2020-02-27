@@ -20,6 +20,21 @@ namespace ML_lab_issues
         static void Main(string[] args)
         {
             _mlContext = new MLContext(seed: 0);
+            _trainingDataView = _mlContext.Data.LoadFromTextFile<GitHubIssue>(_trainDataPath, hasHeader: true);
+
+            var pipeline = ProcessData();
+        }
+
+        public static IEstimator<ITransformer> ProcessData()
+        {
+            var pipeline =
+                _mlContext.Transforms.Conversion.MapValueToKey(inputColumnName: "Area", outputColumnName: "Label")
+                .Append(_mlContext.Transforms.Text.FeaturizeText(inputColumnName: "Title", outputColumnName: "TitleFeaturized"))
+                .Append(_mlContext.Transforms.Text.FeaturizeText(inputColumnName: "Description", outputColumnName: "DescriptionFeaturized"))
+                .Append(_mlContext.Transforms.Concatenate("Features", "TitleFeaturized", "DescriptionFeaturized"))
+                .AppendCacheCheckpoint(_mlContext);  //TO DO: remove when handling large datasets
+
+            return pipeline;
         }
     }
 }
