@@ -24,6 +24,8 @@ namespace ML_lab_issues
 
             var pipeline = ProcessData();
             var trainingPipeline = BuildAndTrainModel(_trainingDataView, pipeline);
+
+            Evaluate(_trainingDataView.Schema);
         }
 
         public static IEstimator<ITransformer> BuildAndTrainModel(IDataView trainingDataView, IEstimator<ITransformer> pipeline)
@@ -50,6 +52,21 @@ namespace ML_lab_issues
             CheckPrediction();
 
             return trainingPipeline;
+        }
+
+        public static void Evaluate(DataViewSchema trainingDataViewSchema)
+        {
+            var testDataView = _mlContext.Data.LoadFromTextFile<GitHubIssue>(_testDataPath, hasHeader: true);
+            var testMetrics = _mlContext.MulticlassClassification.Evaluate(_trainedModel.Transform(testDataView));
+
+            Console.WriteLine($"*************************************************************************************************************");
+            Console.WriteLine($"*       Metrics for Multi-class Classification model - Test Data     ");
+            Console.WriteLine($"*------------------------------------------------------------------------------------------------------------");
+            Console.WriteLine($"*       MicroAccuracy:    {testMetrics.MicroAccuracy:0.###}");
+            Console.WriteLine($"*       MacroAccuracy:    {testMetrics.MacroAccuracy:0.###}");
+            Console.WriteLine($"*       LogLoss:          {testMetrics.LogLoss:#.###}");
+            Console.WriteLine($"*       LogLossReduction: {testMetrics.LogLossReduction:#.###}");
+            Console.WriteLine($"*************************************************************************************************************");
         }
 
         public static IEstimator<ITransformer> ProcessData()
