@@ -67,6 +67,13 @@ namespace ML_lab_issues
             Console.WriteLine($"*       LogLoss:          {testMetrics.LogLoss:#.###}");
             Console.WriteLine($"*       LogLossReduction: {testMetrics.LogLossReduction:#.###}");
             Console.WriteLine($"*************************************************************************************************************");
+
+            SaveModelAsFile(_mlContext, trainingDataViewSchema, _trainedModel);
+        }
+
+        private static void SaveModelAsFile(MLContext mlContext, DataViewSchema trainingDataViewSchema, ITransformer model)
+        {
+            mlContext.Model.Save(model, trainingDataViewSchema, _modelPath);
         }
 
         public static IEstimator<ITransformer> ProcessData()
