@@ -26,6 +26,8 @@ namespace ML_lab_issues
             var trainingPipeline = BuildAndTrainModel(_trainingDataView, pipeline);
 
             Evaluate(_trainingDataView.Schema);
+
+            PredictIssue();
         }
 
         public static IEstimator<ITransformer> BuildAndTrainModel(IDataView trainingDataView, IEstimator<ITransformer> pipeline)
@@ -69,6 +71,21 @@ namespace ML_lab_issues
             Console.WriteLine($"*************************************************************************************************************");
 
             SaveModelAsFile(_mlContext, trainingDataViewSchema, _trainedModel);
+        }
+
+        private static void PredictIssue()
+        {
+            ITransformer loadedModel = _mlContext.Model.Load(_modelPath, out var modelInputSchema);
+            GitHubIssue singleIssue = new GitHubIssue()
+            {
+                Title = "Entity Framework crashes", 
+                Description = "When connecting to the database, EF is crashing"
+            };
+
+            _predEngine = _mlContext.Model.CreatePredictionEngine<GitHubIssue, IssuePrediction>(loadedModel);
+            var prediction = _predEngine.Predict(singleIssue);
+
+            Console.WriteLine($"=============== Single Prediction - Result: {prediction.Area} ===============");
         }
 
         private static void SaveModelAsFile(MLContext mlContext, DataViewSchema trainingDataViewSchema, ITransformer model)
